@@ -77,7 +77,7 @@ def rps(selected_diff):
 def probability_event():
     return random.random()
 
-def move_check(player_choice, computer_choice):                             #NIGGA THIS TOOK ME 2 HOURS TO FIGURE OUT
+def move_check(player_choice, computer_choice):                             #THIS TOOK ME 2 HOURS TO FIGURE OUT
     if player_choice == computer_choice:
         result = "It's a tie!"
     elif (player_choice == "rock" and computer_choice == "scissors") or \
