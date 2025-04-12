@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
 from tkinter import Label
-#from tkinter import ttk
 import ttkbootstrap as ttk
 from ttkbootstrap import Style
 from ttkbootstrap import Window
@@ -16,12 +15,13 @@ import sys
 
 
 #Main Window 
-root = Window(themename = 'darkly')
+root = Window(themename='darkly')
 root.withdraw()
 windowstart = Toplevel(root)
 windowstart.title("Simple Rock, Paper, Scissors!")
 windowstart.geometry('800x400')
 windowstart.tk.call('tk', 'scaling', 2.0)
+
 #Game Window
 windowgame = Toplevel(root)
 windowgame.withdraw()
@@ -143,8 +143,6 @@ def diff_impossible(player_choice):
     else:
         result = "You Lose! (As expected...)"
     messagebox.showinfo("Impossible Mode Result", f"You chose {player_choice.upper()}.\nComputer chose {computer_choice.upper()}.\n\n{result}")
-#   move_check(player_choice, computer_choice)
-#   result_label.config(text=f"You chose {player_choice}. Computer chose {computer_choice}.\n{result}")
     retry = messagebox.askyesno("Play Again?", "Do you want to try again?")
     if retry:
         windowgame.withdraw()
@@ -157,21 +155,6 @@ def show_start_window():
     diffopt.set("")
     windowstart.deiconify()
 
-
-#def retry():
-#    tryagain =int(input("Enter Value: "))
-#    i=0
-#    while i==0:
-#        if tryagain == 1:
-#            rps()
-#        elif tryagain == 2:
-#            print("Thanks for playing!")
-#            time.sleep(3)
-#            i=i+1
-#            break
-#        else:
-#            print("Wrong input! Enter Again")
-#            retry()
 
 ##GUI ELEMENTS##
 
@@ -204,8 +187,6 @@ hardimg_path = resource_path("assets/hard.png")
 impossimg_path = resource_path("assets/impossible.png")
 normalbtn = resource_path("assets/btn_normal.png")
 hoverbtn = resource_path("assets/btn_hover.png")
-#print("Easy Image Path:", easyimg_path)
-#print("Files in dir:", os.listdir(os.path.dirname(easyimg_path))) #was debugging shit
 splashimg_path = resource_path("assets/splashimage.png")
 rockimg_path = resource_path("assets/rock.png")
 paperimg_path = resource_path("assets/paper.png")
@@ -221,7 +202,9 @@ hoverbtn_re = Image.open(hoverbtn).resize((180,60), Image.LANCZOS)
 rockimg_re = Image.open(rockimg_path).resize((150, 150))
 paperimg_re = Image.open(paperimg_path).resize((150, 150))
 scissorsimg_re = Image.open(scissorsimg_path).resize((150, 150))
-splashimg_re = Image.open(splashimg_path).resize((300, 300))
+splashimg_re = Image.open(splashimg_path).resize((250, 250)).convert("RGBA")
+background = Image.new("RGBA", splashimg_re.size, (30, 30, 30, 255))  # RGB for #1e1e1e
+flattened = Image.alpha_composite(background, splashimg_re)
 
 #images haha 3
 easyimg = ImageTk.PhotoImage(imgeasy_re)
@@ -236,14 +219,35 @@ normalbtnimg = ImageTk.PhotoImage(normalbtn_re)
 root.normalbtnimg = normalbtnimg
 hoverbtnimg = ImageTk.PhotoImage(hoverbtn_re)
 root.hoverbtnimg = hoverbtnimg
+rockimg = ImageTk.PhotoImage(rockimg_re)
+root.rockimg = rockimg
+paperimg = ImageTk.PhotoImage(paperimg_re)
+root.paperimg = paperimg
+scissorsimg = ImageTk.PhotoImage(scissorsimg_re)
+root.scissorsimg = scissorsimg
+splashimg = ImageTk.PhotoImage(splashimg_re)
+root.splashimg = splashimg
+
+#Splash Image :D
+splash_canvas = tk.Canvas(windowstart, width=300, height=300, bg="#ffffff", bd=0, highlightthickness=0)
+splash_canvas.place(x=480, y=100)
+splash_img_obj = splash_canvas.create_image(0, 0, anchor="nw", image=root.splashimg)
+
+float_direction = 1
+#floaty anims
+def float_splash():
+    global float_direction
+    coords = splash_canvas.coords(splash_img_obj)
+    y = coords[1] + float_direction
+    splash_canvas.coords(splash_img_obj, coords[0], y)
+    if y <= 0 or y >= 10:
+        float_direction *= -1
+    windowstart.after(75, float_splash)
+
+float_splash()
 
 
-#Labels imma kms
-#btn_label = tk.Label(windowstart, image=normalbtnimg, borderwidth=0)
-#btn_label.image = normalbtnimg
-#sbtn_label.place(x=100, y=100)
-
-#IDK WTF but experiment
+#IDK WTF but experimenting with combining button img and the bg
 combined = normalbtn_re.copy()
 draw = ImageDraw.Draw(combined)
 draw.text((60, 10), "Easy", font=bold_font, fill="white")
@@ -296,21 +300,13 @@ def create_canvas_button(master, x, y, bg_image, icon_image, text, command, hove
         canvas.tag_bind(label, "<Button-1>", on_click)
 
     return canvas
+
 #buttonsStarting-
 diffopt = tk.StringVar()
 btn_easy = create_canvas_button(windowstart, 100, 100, root.normalbtnimg, root.easyimg, "Easy", lambda: set_difficulty('easy'), hover_image=root.hoverbtnimg)
 btn_normal = create_canvas_button(windowstart, 100, 160, root.normalbtnimg, root.normalimg, "Normal", lambda: set_difficulty('normal'), hover_image=root.hoverbtnimg)
 btn_hard = create_canvas_button(windowstart, 100, 220, root.normalbtnimg, root.hardimg, "Hard", lambda: set_difficulty('hard'), hover_image=root.hoverbtnimg)
 btn_impossible = create_canvas_button(windowstart, 100, 280, root.normalbtnimg, root.impossimg, "Impossible", lambda: set_difficulty('impossible'), hover_image=root.hoverbtnimg, width=160)
-#buttonEasy = ttk.Button(master=windowstart, image=easyfinal_img, command=lambda: set_difficulty('easy'), style="TButton")
-#buttonNormal = ttk.Button(master=windowstart, text=' Normal', image=normalimg, compound='left', command=lambda: set_difficulty('normal'), bootstyle="success", style="Bold.TButton")
-#buttonHard = ttk.Button(master=windowstart, text=' Hard', image=hardimg, compound='left', command=lambda: set_difficulty('hard'), bootstyle="success", style="Bold.TButton")
-#buttonImpossible = ttk.Button(master=windowstart, text=' Impossible', image=impossimg, compound='left', command=lambda: set_difficulty('impossible'), bootstyle="success", style="Bold.TButton")
-#buttonEasy.pack(x=100, y=100, width=120, height=40, pady=10)
-#buttonEasy.place(x=100 + 10, y=100 + 5)
-#buttonNormal.place(x=100, y=160)
-#buttonHard.place(x=100, y=220)
-#buttonImpossible.place(x=100, y=280)
 
 #GameButtons
 buttonRock = ttk.Button(master=windowgame, text='Rock', command=lambda: rps_play("rock"))
@@ -322,7 +318,5 @@ result_label.pack(pady=20)
 buttonRock.pack()
 buttonPaper.pack()
 buttonScissors.pack()
-#btn_label.lower()
-#buttonEasy.lift()
 
 windowstart.mainloop()
